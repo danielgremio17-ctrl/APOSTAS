@@ -2,7 +2,7 @@
   "name": "Controle de Apostas Esportivas",
   "short_name": "Apostas",
   "description": "App para controle de apostas esportivas de futebol - odds, aportes, banca e stake.",
-  "start_url": "./apostas.html",
+  "start_url": "./index.html",
   "display": "standalone",
   "background_color": "#0f1419",
   "theme_color": "#0f1419",
