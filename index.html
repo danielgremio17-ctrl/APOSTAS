@@ -1,0 +1,1044 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#0f1419">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Apostas">
+<link rel="manifest" href="manifest.json">
+<title>Controle de Apostas Esportivas</title>
+<style>
+  :root {
+    --bg: #0f1419;
+    --bg-card: #1a2129;
+    --bg-card-2: #212a34;
+    --border: #2c3640;
+    --text: #e8edf2;
+    --text-dim: #8b98a5;
+    --green: #2ecc71;
+    --green-dim: #1e8449;
+    --red: #e74c3c;
+    --red-dim: #922b21;
+    --yellow: #f1c40f;
+    --blue: #3498db;
+    --accent: #22c55e;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    padding: 12px;
+    padding-bottom: 60px;
+  }
+  h1 {
+    font-size: 1.3rem;
+    margin: 4px 0 14px 0;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  h1 .ball { font-size: 1.3rem; }
+
+  .top-config {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+    margin-bottom: 12px;
+  }
+  .top-config .field {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 8px 10px;
+  }
+  .field label {
+    display: block;
+    font-size: 0.68rem;
+    color: var(--text-dim);
+    text-transform: uppercase;
+    letter-spacing: .04em;
+    margin-bottom: 3px;
+  }
+  .field input, .field select {
+    width: 100%;
+    background: transparent;
+    border: none;
+    color: var(--text);
+    font-size: 0.98rem;
+    font-weight: 600;
+    outline: none;
+    padding: 0;
+  }
+
+  .aporte-calc {
+    display: flex;
+    gap: 6px;
+    margin-top: 8px;
+    padding-top: 8px;
+    border-top: 1px dashed var(--border);
+  }
+  .aporte-calc input {
+    flex: 1;
+    background: var(--bg-card-2) !important;
+    border: 1px solid var(--border) !important;
+    border-radius: 6px;
+    padding: 6px 8px !important;
+    font-size: 0.8rem !important;
+    font-weight: 400 !important;
+  }
+  .aporte-calc button {
+    background: var(--accent);
+    color: #08130c;
+    border: none;
+    border-radius: 6px;
+    padding: 6px 12px;
+    font-size: 0.78rem;
+    font-weight: 700;
+    cursor: pointer;
+    white-space: nowrap;
+  }
+  .aporte-calc button:active { opacity: 0.85; }
+
+  .cards {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 8px;
+    margin-bottom: 14px;
+  }
+  .card {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 10px 12px;
+  }
+  .card .label { font-size: 0.68rem; color: var(--text-dim); text-transform: uppercase; letter-spacing: .04em; }
+  .card .value { font-size: 1.15rem; font-weight: 700; margin-top: 2px; }
+  .pos { color: var(--green); }
+  .neg { color: var(--red); }
+  .neutral { color: var(--text); }
+
+  .add-btn {
+    width: 100%;
+    background: var(--accent);
+    color: #08130c;
+    border: none;
+    border-radius: 10px;
+    padding: 12px;
+    font-size: 0.95rem;
+    font-weight: 700;
+    margin-bottom: 12px;
+    cursor: pointer;
+  }
+  .add-btn:active { opacity: 0.85; }
+
+  .form-panel {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 12px;
+    margin-bottom: 14px;
+    display: none;
+  }
+  .form-panel.open { display: block; }
+  .form-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+    margin-bottom: 10px;
+  }
+  .form-grid .full { grid-column: 1 / -1; }
+  .form-panel label {
+    display: block;
+    font-size: 0.7rem;
+    color: var(--text-dim);
+    margin-bottom: 3px;
+  }
+  .form-panel input, .form-panel select {
+    width: 100%;
+    background: var(--bg-card-2);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    color: var(--text);
+    padding: 8px 9px;
+    font-size: 0.9rem;
+    outline: none;
+  }
+  .suggestion {
+    font-size: 0.72rem;
+    color: var(--yellow);
+    margin-top: 3px;
+  }
+  .form-actions {
+    display: flex;
+    gap: 8px;
+  }
+  .form-actions button {
+    flex: 1;
+    border: none;
+    border-radius: 8px;
+    padding: 10px;
+    font-weight: 700;
+    font-size: 0.88rem;
+    cursor: pointer;
+  }
+  .btn-save { background: var(--accent); color: #08130c; }
+  .btn-cancel { background: var(--bg-card-2); color: var(--text-dim); border: 1px solid var(--border) !important; }
+
+  .filter-row {
+    display: flex;
+    gap: 6px;
+    margin-bottom: 10px;
+    overflow-x: auto;
+  }
+  .filter-row button {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    color: var(--text-dim);
+    border-radius: 20px;
+    padding: 6px 12px;
+    font-size: 0.75rem;
+    white-space: nowrap;
+    cursor: pointer;
+  }
+  .filter-row button.active {
+    background: var(--accent);
+    color: #08130c;
+    border-color: var(--accent);
+    font-weight: 700;
+  }
+
+  .bet-list { display: flex; flex-direction: column; gap: 8px; }
+  .bet-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-left: 4px solid var(--text-dim);
+    border-radius: 10px;
+    padding: 10px 12px;
+  }
+  .bet-card.status-green { border-left-color: var(--green); }
+  .bet-card.status-red { border-left-color: var(--red); }
+  .bet-card.status-void { border-left-color: var(--yellow); }
+  .bet-card.status-pendente { border-left-color: var(--blue); }
+
+  .bet-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 6px;
+  }
+  .bet-event { font-weight: 700; font-size: 0.92rem; }
+  .bet-date { font-size: 0.72rem; color: var(--text-dim); }
+  .bet-badge {
+    font-size: 0.68rem;
+    font-weight: 700;
+    padding: 2px 8px;
+    border-radius: 20px;
+    text-transform: uppercase;
+  }
+  .badge-green { background: rgba(46,204,113,0.15); color: var(--green); }
+  .badge-red { background: rgba(231,76,60,0.15); color: var(--red); }
+  .badge-void { background: rgba(241,196,15,0.15); color: var(--yellow); }
+  .badge-pendente { background: rgba(52,152,219,0.15); color: var(--blue); }
+
+  .bet-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 4px;
+    margin-bottom: 6px;
+  }
+  .bet-grid div { font-size: 0.72rem; }
+  .bet-grid .mini-label { color: var(--text-dim); display: block; font-size: 0.62rem; text-transform: uppercase; }
+  .bet-grid .mini-value { font-weight: 700; font-size: 0.82rem; }
+
+  .bet-actions {
+    display: flex;
+    gap: 6px;
+    justify-content: flex-end;
+    margin-top: 4px;
+  }
+  .bet-actions button {
+    background: var(--bg-card-2);
+    border: 1px solid var(--border);
+    color: var(--text-dim);
+    border-radius: 6px;
+    padding: 4px 10px;
+    font-size: 0.72rem;
+    cursor: pointer;
+  }
+  .bet-actions button.del { color: var(--red); }
+  .bet-actions button.res { color: var(--yellow); }
+
+  .chart-panel {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 12px;
+    margin-bottom: 14px;
+  }
+  .chart-panel .chart-title {
+    font-size: 0.78rem;
+    color: var(--text-dim);
+    text-transform: uppercase;
+    letter-spacing: .04em;
+    margin-bottom: 6px;
+  }
+  .chart-panel canvas {
+    width: 100%;
+    height: 160px;
+    display: block;
+  }
+  .chart-empty {
+    text-align: center;
+    color: var(--text-dim);
+    font-size: 0.8rem;
+    padding: 30px 0;
+  }
+
+  .fonte-panel {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 12px;
+    margin-bottom: 14px;
+  }
+  .fonte-panel .chart-title {
+    font-size: 0.78rem;
+    color: var(--text-dim);
+    text-transform: uppercase;
+    letter-spacing: .04em;
+    margin-bottom: 8px;
+  }
+  .fonte-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px 0;
+    border-bottom: 1px solid var(--border);
+    gap: 8px;
+  }
+  .fonte-row:last-child { border-bottom: none; }
+  .fonte-nome {
+    font-weight: 700;
+    font-size: 0.85rem;
+    flex: 1;
+  }
+  .fonte-stats {
+    display: flex;
+    gap: 12px;
+    font-size: 0.72rem;
+    text-align: right;
+  }
+  .fonte-stats .fs-item .fs-label { color: var(--text-dim); display: block; font-size: 0.62rem; text-transform: uppercase; }
+  .fonte-stats .fs-item .fs-value { font-weight: 700; font-size: 0.82rem; }
+  .fonte-empty {
+    text-align: center;
+    color: var(--text-dim);
+    font-size: 0.78rem;
+    padding: 10px 0;
+  }
+
+  .empty {
+    text-align: center;
+    color: var(--text-dim);
+    padding: 30px 10px;
+    font-size: 0.85rem;
+  }
+
+  .footer-note {
+    text-align: center;
+    font-size: 0.68rem;
+    color: var(--text-dim);
+    margin-top: 16px;
+  }
+
+  .toast {
+    position: fixed;
+    bottom: 16px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: var(--bg-card-2);
+    border: 1px solid var(--border);
+    color: var(--text);
+    padding: 8px 16px;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    opacity: 0;
+    transition: opacity 0.3s;
+    pointer-events: none;
+    z-index: 999;
+  }
+  .toast.show { opacity: 1; }
+
+  .backup-row {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 12px;
+  }
+  .backup-row button {
+    flex: 1;
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    color: var(--text-dim);
+    border-radius: 8px;
+    padding: 8px;
+    font-size: 0.75rem;
+    cursor: pointer;
+  }
+  .backup-row button:active { opacity: 0.8; }
+</style>
+</head>
+<body>
+
+<h1><span class="ball">⚽</span> Controle de Apostas</h1>
+
+<div class="backup-row">
+  <button id="btnExportar">⬇ Exportar backup</button>
+  <button id="btnImportar">⬆ Importar backup</button>
+  <input type="file" id="fileImportar" accept="application/json" style="display:none;">
+</div>
+
+<div class="top-config">
+  <div class="field">
+    <label>Aportes Totais (R$)</label>
+    <input type="number" id="bancaInicial" step="0.01" placeholder="0,00">
+    <div class="aporte-calc">
+      <input type="number" id="novoAporte" step="0.01" placeholder="+ novo aporte">
+      <button id="btnAdicionarAporte">Add</button>
+    </div>
+  </div>
+  <div class="field">
+    <label>% Stake Padrão</label>
+    <input type="number" id="stakePadrao" step="0.1" placeholder="ex: 2">
+  </div>
+</div>
+
+<div class="cards">
+  <div class="card">
+    <div class="label">Banca Atual</div>
+    <div class="value neutral" id="cardBancaAtual">R$ 0,00</div>
+  </div>
+  <div class="card">
+    <div class="label">Lucro / Prejuízo</div>
+    <div class="value" id="cardLucro">R$ 0,00</div>
+  </div>
+  <div class="card">
+    <div class="label">ROI</div>
+    <div class="value" id="cardRoi">0%</div>
+  </div>
+  <div class="card">
+    <div class="label">Taxa de Acerto</div>
+    <div class="value neutral" id="cardTaxa">0% (0/0)</div>
+  </div>
+  <div class="card">
+    <div class="label">Total Apostado (com pendentes)</div>
+    <div class="value neutral" id="cardTotalApostado">R$ 0,00</div>
+  </div>
+  <div class="card">
+    <div class="label">Nº de Apostas</div>
+    <div class="value neutral" id="cardQtd">0</div>
+  </div>
+</div>
+
+<div class="chart-panel">
+  <div class="chart-title">Evolução da Banca</div>
+  <canvas id="chartBanca" width="600" height="160"></canvas>
+  <div class="chart-empty" id="chartEmpty" style="display:none;">Registre apostas com resultado para ver o gráfico.</div>
+</div>
+
+<div class="fonte-panel">
+  <div class="chart-title">Desempenho por Fonte</div>
+  <div id="fonteList"></div>
+</div>
+
+<button class="add-btn" id="btnAbrirForm">+ Nova Aposta</button>
+
+<div class="form-panel" id="formPanel">
+  <div class="form-grid">
+    <div>
+      <label>Data</label>
+      <input type="date" id="fData">
+    </div>
+    <div>
+      <label>Jogo / Evento</label>
+      <input type="text" id="fEvento" placeholder="Ex: Flamengo x Palmeiras">
+    </div>
+    <div class="full">
+      <label>Fonte (grupo/tipster ou análise própria)</label>
+      <input type="text" id="fFonte" list="listaFontes" placeholder="Ex: Grupo Telegram X, Análise própria">
+      <datalist id="listaFontes"></datalist>
+    </div>
+    <div>
+      <label>Liga / Campeonato</label>
+      <input type="text" id="fLiga" placeholder="Ex: Brasileirão Série A">
+    </div>
+    <div>
+      <label>Mercado (opcional)</label>
+      <input type="text" id="fMercado" placeholder="Ex: Over 2.5 gols">
+    </div>
+    <div>
+      <label>ODD</label>
+      <input type="number" id="fOdd" step="0.01" placeholder="Ex: 1.85">
+    </div>
+    <div>
+      <label>% Stake usada</label>
+      <input type="number" id="fStake" step="0.1" placeholder="Ex: 2">
+    </div>
+    <div>
+      <label>Aporte (R$)</label>
+      <input type="number" id="fAporte" step="0.01" placeholder="0,00">
+    </div>
+    <div class="full">
+      <div class="suggestion" id="fSugestao"></div>
+    </div>
+    <div>
+      <label>Resultado</label>
+      <select id="fResultado">
+        <option value="pendente">Pendente</option>
+        <option value="green">Green (Ganhou)</option>
+        <option value="red">Red (Perdeu)</option>
+        <option value="void">Anulada / Void</option>
+      </select>
+    </div>
+  </div>
+  <div class="form-actions">
+    <button class="btn-save" id="btnSalvarAposta">Salvar</button>
+    <button class="btn-cancel" id="btnCancelarAposta">Cancelar</button>
+  </div>
+</div>
+
+<div class="filter-row" id="filterRow">
+  <button data-f="todas" class="active">Todas</button>
+  <button data-f="pendente">Pendentes</button>
+  <button data-f="green">Green</button>
+  <button data-f="red">Red</button>
+  <button data-f="void">Anuladas</button>
+</div>
+
+<div class="bet-list" id="betList"></div>
+<div class="empty" id="emptyMsg" style="display:none;">Nenhuma aposta registrada ainda. Toque em "+ Nova Aposta" para começar.</div>
+
+<div class="footer-note">Seus dados ficam salvos automaticamente neste dispositivo.</div>
+<div class="toast" id="toast"></div>
+
+<script>
+let state = {
+  bancaInicial: 0,
+  stakePadrao: 2,
+  apostas: [] // {id, data, evento, liga, mercado, odd, stakePct, aporte, resultado, bancaApos}
+};
+let editingId = null;
+let currentFilter = 'todas';
+const STORAGE_KEY = 'apostas-esportivas-v1';
+
+function fmtMoney(v) {
+  return 'R$ ' + (v || 0).toLocaleString('pt-BR', {minimumFractionDigits:2, maximumFractionDigits:2});
+}
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'), 1800);
+}
+
+function saveState() {
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+  } catch(e) {
+    console.error('Erro ao salvar:', e);
+    showToast('Erro ao salvar os dados.');
+  }
+}
+
+function loadState() {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if (raw) {
+      const parsed = JSON.parse(raw);
+      state = Object.assign(state, parsed);
+    }
+  } catch(e) {
+    console.log('Nenhum dado salvo encontrado ainda.');
+  }
+  document.getElementById('bancaInicial').value = state.bancaInicial || '';
+  document.getElementById('stakePadrao').value = state.stakePadrao || '';
+  render();
+}
+
+function exportarBackup() {
+  const blob = new Blob([JSON.stringify(state, null, 2)], {type: 'application/json'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  const dataHoje = new Date().toISOString().slice(0,10);
+  a.href = url;
+  a.download = `backup-apostas-${dataHoje}.json`;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+  showToast('Backup exportado!');
+}
+
+function importarBackup(file) {
+  const reader = new FileReader();
+  reader.onload = (e) => {
+    try {
+      const parsed = JSON.parse(e.target.result);
+      if (!parsed || !Array.isArray(parsed.apostas)) {
+        showToast('Arquivo inválido.');
+        return;
+      }
+      if (!confirm('Importar este backup vai substituir todos os dados atuais. Continuar?')) return;
+      state = {
+        bancaInicial: parsed.bancaInicial || 0,
+        stakePadrao: parsed.stakePadrao || 0,
+        apostas: parsed.apostas || []
+      };
+      saveState();
+      document.getElementById('bancaInicial').value = state.bancaInicial || '';
+      document.getElementById('stakePadrao').value = state.stakePadrao || '';
+      render();
+      showToast('Backup importado com sucesso!');
+    } catch(err) {
+      showToast('Não foi possível ler o arquivo.');
+    }
+  };
+  reader.readAsText(file);
+}
+
+// Recalcula a banca: o aporte é debitado assim que a aposta é criada (pendente ou não),
+// e o retorno (aporte + lucro) só volta quando a aposta é resolvida (green/red/void).
+function recalcular() {
+  const ordenadas = [...state.apostas].sort((a,b) => {
+    if (a.data !== b.data) return a.data.localeCompare(b.data);
+    return a.id - b.id;
+  });
+  let banca = parseFloat(state.bancaInicial) || 0; // Aportes Totais
+  ordenadas.forEach(ap => {
+    let retorno = 0;
+    const resolvida = ap.resultado !== 'pendente';
+
+    if (ap.resultado === 'green') retorno = ap.aporte * ap.odd;
+    else if (ap.resultado === 'void') retorno = ap.aporte;
+    else if (ap.resultado === 'red') retorno = 0;
+    else retorno = 0; // pendente: ainda nao voltou nada
+
+    banca = banca - ap.aporte; // debita na hora que a aposta e feita
+    if (resolvida) {
+      banca = banca + retorno; // credita de volta quando resolve
+    }
+
+    ap.bancaApos = banca;
+    ap.retorno = resolvida ? retorno : null;
+    ap.lucro = resolvida ? (retorno - ap.aporte) : 0;
+  });
+  return banca;
+}
+
+function render() {
+  const bancaFinal = recalcular();
+  document.getElementById('cardBancaAtual').textContent = fmtMoney(bancaFinal);
+
+  const resolvidas = state.apostas.filter(a => a.resultado !== 'pendente');
+  const totalApostadoResolvidas = resolvidas.reduce((s,a)=>s+parseFloat(a.aporte||0),0);
+  const totalApostadoGeral = state.apostas.reduce((s,a)=>s+parseFloat(a.aporte||0),0);
+  const lucroTotal = resolvidas.reduce((s,a)=>s+(a.lucro||0),0);
+  const roi = totalApostadoResolvidas > 0 ? (lucroTotal/totalApostadoResolvidas*100) : 0;
+  const greens = resolvidas.filter(a=>a.resultado==='green').length;
+  const contabilizaveis = resolvidas.filter(a=>a.resultado==='green'||a.resultado==='red').length;
+  const taxa = contabilizaveis > 0 ? (greens/contabilizaveis*100) : 0;
+
+  const lucroEl = document.getElementById('cardLucro');
+  lucroEl.textContent = fmtMoney(lucroTotal);
+  lucroEl.className = 'value ' + (lucroTotal > 0 ? 'pos' : lucroTotal < 0 ? 'neg' : 'neutral');
+
+  const roiEl = document.getElementById('cardRoi');
+  roiEl.textContent = roi.toFixed(1) + '%';
+  roiEl.className = 'value ' + (roi > 0 ? 'pos' : roi < 0 ? 'neg' : 'neutral');
+
+  document.getElementById('cardTaxa').textContent = taxa.toFixed(0) + '% (' + greens + '/' + contabilizaveis + ')';
+  document.getElementById('cardTotalApostado').textContent = fmtMoney(totalApostadoGeral);
+  document.getElementById('cardQtd').textContent = state.apostas.length;
+
+  renderList(bancaFinal);
+  updateSugestao();
+  drawChart();
+  renderFontes();
+  atualizarListaFontes();
+}
+
+function renderFontes() {
+  const container = document.getElementById('fonteList');
+  const resolvidas = state.apostas.filter(a => a.resultado !== 'pendente');
+
+  if (resolvidas.length === 0) {
+    container.innerHTML = '<div class="fonte-empty">Nenhuma aposta resolvida ainda para comparar fontes.</div>';
+    return;
+  }
+
+  const grupos = {};
+  resolvidas.forEach(ap => {
+    const chave = ap.fonte && ap.fonte.trim() ? ap.fonte.trim() : 'Sem fonte definida';
+    if (!grupos[chave]) grupos[chave] = { total: 0, greens: 0, contabilizaveis: 0, apostado: 0, lucro: 0 };
+    const g = grupos[chave];
+    g.total += 1;
+    g.apostado += parseFloat(ap.aporte || 0);
+    g.lucro += ap.lucro || 0;
+    if (ap.resultado === 'green' || ap.resultado === 'red') {
+      g.contabilizaveis += 1;
+      if (ap.resultado === 'green') g.greens += 1;
+    }
+  });
+
+  const nomes = Object.keys(grupos).sort((a,b) => grupos[b].total - grupos[a].total);
+
+  container.innerHTML = nomes.map(nome => {
+    const g = grupos[nome];
+    const taxa = g.contabilizaveis > 0 ? (g.greens / g.contabilizaveis * 100) : 0;
+    const roi = g.apostado > 0 ? (g.lucro / g.apostado * 100) : 0;
+    const lucroClass = g.lucro > 0 ? 'pos' : g.lucro < 0 ? 'neg' : 'neutral';
+    const roiClass = roi > 0 ? 'pos' : roi < 0 ? 'neg' : 'neutral';
+    return `
+      <div class="fonte-row">
+        <div class="fonte-nome">${escapeHtml(nome)}</div>
+        <div class="fonte-stats">
+          <div class="fs-item"><span class="fs-label">Acerto</span><span class="fs-value">${taxa.toFixed(0)}% (${g.greens}/${g.contabilizaveis})</span></div>
+          <div class="fs-item"><span class="fs-label">Lucro</span><span class="fs-value ${lucroClass}">${fmtMoney(g.lucro)}</span></div>
+          <div class="fs-item"><span class="fs-label">ROI</span><span class="fs-value ${roiClass}">${roi.toFixed(1)}%</span></div>
+        </div>
+      </div>
+    `;
+  }).join('');
+}
+
+function atualizarListaFontes() {
+  const fontesUnicas = [...new Set(state.apostas.map(a => a.fonte).filter(f => f && f.trim()))];
+  const datalist = document.getElementById('listaFontes');
+  datalist.innerHTML = fontesUnicas.map(f => `<option value="${escapeHtml(f)}"></option>`).join('');
+}
+
+function drawChart() {
+  const canvas = document.getElementById('chartBanca');
+  const emptyEl = document.getElementById('chartEmpty');
+  const ctx = canvas.getContext('2d');
+
+  // Ajusta resolução ao tamanho real exibido (retina-friendly)
+  const rect = canvas.getBoundingClientRect();
+  const dpr = window.devicePixelRatio || 1;
+  canvas.width = rect.width * dpr;
+  canvas.height = 160 * dpr;
+  ctx.setTransform(1,0,0,1,0,0);
+  ctx.scale(dpr, dpr);
+  const W = rect.width;
+  const H = 160;
+  ctx.clearRect(0,0,W,H);
+
+  const bancaInicial = parseFloat(state.bancaInicial) || 0;
+  const resolvidas = [...state.apostas]
+    .filter(a => a.resultado !== 'pendente')
+    .sort((a,b) => a.data !== b.data ? a.data.localeCompare(b.data) : a.id - b.id);
+
+  if (resolvidas.length === 0) {
+    canvas.style.display = 'none';
+    emptyEl.style.display = 'block';
+    return;
+  }
+  canvas.style.display = 'block';
+  emptyEl.style.display = 'none';
+
+  const pontos = [bancaInicial, ...resolvidas.map(a => a.bancaApos)];
+  const min = Math.min(...pontos);
+  const max = Math.max(...pontos);
+  const pad = 18;
+  const range = (max - min) || 1;
+
+  const xStep = (W - pad*2) / (pontos.length - 1 || 1);
+  const yFor = v => H - pad - ((v - min) / range) * (H - pad*2);
+  const xFor = i => pad + i * xStep;
+
+  // linha de referência (banca inicial)
+  ctx.strokeStyle = 'rgba(139,152,165,0.35)';
+  ctx.setLineDash([4,4]);
+  ctx.lineWidth = 1;
+  ctx.beginPath();
+  ctx.moveTo(pad, yFor(bancaInicial));
+  ctx.lineTo(W - pad, yFor(bancaInicial));
+  ctx.stroke();
+  ctx.setLineDash([]);
+
+  // área preenchida
+  const corLinha = pontos[pontos.length-1] >= bancaInicial ? '#2ecc71' : '#e74c3c';
+  ctx.beginPath();
+  pontos.forEach((v,i) => {
+    const x = xFor(i), y = yFor(v);
+    if (i===0) ctx.moveTo(x,y); else ctx.lineTo(x,y);
+  });
+  ctx.lineTo(xFor(pontos.length-1), H - pad);
+  ctx.lineTo(xFor(0), H - pad);
+  ctx.closePath();
+  ctx.fillStyle = corLinha + '22';
+  ctx.fill();
+
+  // linha principal
+  ctx.beginPath();
+  pontos.forEach((v,i) => {
+    const x = xFor(i), y = yFor(v);
+    if (i===0) ctx.moveTo(x,y); else ctx.lineTo(x,y);
+  });
+  ctx.strokeStyle = corLinha;
+  ctx.lineWidth = 2;
+  ctx.stroke();
+
+  // pontos
+  ctx.fillStyle = corLinha;
+  pontos.forEach((v,i) => {
+    ctx.beginPath();
+    ctx.arc(xFor(i), yFor(v), i === pontos.length-1 ? 3.5 : 2, 0, Math.PI*2);
+    ctx.fill();
+  });
+
+  // labels min/max
+  ctx.fillStyle = '#8b98a5';
+  ctx.font = '10px -apple-system, sans-serif';
+  ctx.textAlign = 'left';
+  ctx.fillText('R$ ' + max.toFixed(0), pad, 10);
+  ctx.textAlign = 'left';
+  ctx.fillText('R$ ' + min.toFixed(0), pad, H - 4);
+}
+
+window.addEventListener('resize', () => { if (state.apostas.length) drawChart(); });
+
+function renderList() {
+  const list = document.getElementById('betList');
+  const emptyMsg = document.getElementById('emptyMsg');
+  list.innerHTML = '';
+
+  let items = [...state.apostas].sort((a,b) => {
+    if (a.data !== b.data) return b.data.localeCompare(a.data);
+    return b.id - a.id;
+  });
+  if (currentFilter !== 'todas') {
+    items = items.filter(a => a.resultado === currentFilter);
+  }
+
+  if (items.length === 0) {
+    emptyMsg.style.display = 'block';
+    return;
+  }
+  emptyMsg.style.display = 'none';
+
+  const badgeMap = {green:'Green', red:'Red', void:'Anulada', pendente:'Pendente'};
+
+  items.forEach(ap => {
+    const card = document.createElement('div');
+    card.className = 'bet-card status-' + ap.resultado;
+    const dataFmt = ap.data ? ap.data.split('-').reverse().join('/') : '-';
+    const lucroTxt = ap.resultado === 'pendente' ? '—' : fmtMoney(ap.lucro);
+    const lucroClass = ap.resultado === 'pendente' ? '' : (ap.lucro > 0 ? 'pos' : ap.lucro < 0 ? 'neg' : '');
+
+    card.innerHTML = `
+      <div class="bet-top">
+        <div>
+          <div class="bet-event">${escapeHtml(ap.evento || 'Aposta sem nome')}</div>
+          <div class="bet-date">${dataFmt}${ap.liga ? ' · ' + escapeHtml(ap.liga) : ''}${ap.mercado ? ' · ' + escapeHtml(ap.mercado) : ''}</div>
+          ${ap.fonte ? `<div class="bet-date" style="color:var(--blue);">📌 ${escapeHtml(ap.fonte)}</div>` : ''}
+        </div>
+        <span class="bet-badge badge-${ap.resultado}">${badgeMap[ap.resultado]}</span>
+      </div>
+      <div class="bet-grid">
+        <div><span class="mini-label">Odd</span><span class="mini-value">${parseFloat(ap.odd).toFixed(2)}</span></div>
+        <div><span class="mini-label">Stake %</span><span class="mini-value">${ap.stakePct ? ap.stakePct + '%' : '-'}</span></div>
+        <div><span class="mini-label">Aporte</span><span class="mini-value">${fmtMoney(ap.aporte)}</span></div>
+        <div><span class="mini-label">Lucro</span><span class="mini-value ${lucroClass}">${lucroTxt}</span></div>
+      </div>
+      <div class="bet-actions">
+        ${ap.resultado === 'pendente' ? `
+          <button class="res" data-action="resolve-green" data-id="${ap.id}">Marcar Green</button>
+          <button class="res" data-action="resolve-red" data-id="${ap.id}">Marcar Red</button>
+        ` : ''}
+        <button data-action="edit" data-id="${ap.id}">Editar</button>
+        <button class="del" data-action="delete" data-id="${ap.id}">Excluir</button>
+      </div>
+    `;
+    list.appendChild(card);
+  });
+}
+
+function escapeHtml(str) {
+  const d = document.createElement('div');
+  d.textContent = str;
+  return d.innerHTML;
+}
+
+function updateSugestao() {
+  const banca = recalcular();
+  const stakePct = parseFloat(document.getElementById('fStake').value) || parseFloat(state.stakePadrao) || 0;
+  const sugestao = banca * (stakePct/100);
+  const el = document.getElementById('fSugestao');
+  if (stakePct > 0) {
+    el.textContent = `Sugestão de aporte (${stakePct}% da banca de ${fmtMoney(banca)}): ${fmtMoney(sugestao)}`;
+  } else {
+    el.textContent = '';
+  }
+}
+
+function openForm(ap) {
+  document.getElementById('formPanel').classList.add('open');
+  if (ap) {
+    editingId = ap.id;
+    document.getElementById('fData').value = ap.data;
+    document.getElementById('fEvento').value = ap.evento;
+    document.getElementById('fFonte').value = ap.fonte || '';
+    document.getElementById('fLiga').value = ap.liga || '';
+    document.getElementById('fMercado').value = ap.mercado || '';
+    document.getElementById('fOdd').value = ap.odd;
+    document.getElementById('fStake').value = ap.stakePct || '';
+    document.getElementById('fAporte').value = ap.aporte;
+    document.getElementById('fResultado').value = ap.resultado;
+  } else {
+    editingId = null;
+    document.getElementById('fData').value = new Date().toISOString().slice(0,10);
+    document.getElementById('fEvento').value = '';
+    document.getElementById('fFonte').value = '';
+    document.getElementById('fLiga').value = '';
+    document.getElementById('fMercado').value = '';
+    document.getElementById('fOdd').value = '';
+    document.getElementById('fStake').value = state.stakePadrao || '';
+    document.getElementById('fAporte').value = '';
+    document.getElementById('fResultado').value = 'pendente';
+  }
+  updateSugestao();
+  document.getElementById('formPanel').scrollIntoView({behavior:'smooth', block:'nearest'});
+}
+
+function closeForm() {
+  document.getElementById('formPanel').classList.remove('open');
+  editingId = null;
+}
+
+document.getElementById('btnAbrirForm').addEventListener('click', () => openForm(null));
+document.getElementById('btnCancelarAposta').addEventListener('click', closeForm);
+document.getElementById('fStake').addEventListener('input', updateSugestao);
+
+document.getElementById('btnSalvarAposta').addEventListener('click', async () => {
+  const data = document.getElementById('fData').value;
+  const evento = document.getElementById('fEvento').value.trim();
+  const fonte = document.getElementById('fFonte').value.trim();
+  const liga = document.getElementById('fLiga').value.trim();
+  const mercado = document.getElementById('fMercado').value.trim();
+  const odd = parseFloat(document.getElementById('fOdd').value);
+  const stakePct = parseFloat(document.getElementById('fStake').value) || null;
+  const aporte = parseFloat(document.getElementById('fAporte').value);
+  const resultado = document.getElementById('fResultado').value;
+
+  if (!data || !odd || !aporte) {
+    showToast('Preencha data, odd e aporte.');
+    return;
+  }
+
+  if (editingId) {
+    const idx = state.apostas.findIndex(a => a.id === editingId);
+    if (idx >= 0) {
+      state.apostas[idx] = Object.assign(state.apostas[idx], {data, evento, fonte, liga, mercado, odd, stakePct, aporte, resultado});
+    }
+  } else {
+    state.apostas.push({
+      id: Date.now(),
+      data, evento, fonte, liga, mercado, odd, stakePct, aporte, resultado
+    });
+  }
+  saveState();
+  closeForm();
+  render();
+  showToast('Aposta salva!');
+});
+
+document.getElementById('betList').addEventListener('click', async (e) => {
+  const btn = e.target.closest('button');
+  if (!btn) return;
+  const id = parseFloat(btn.dataset.id);
+  const action = btn.dataset.action;
+  const ap = state.apostas.find(a => a.id === id);
+  if (!ap) return;
+
+  if (action === 'edit') {
+    openForm(ap);
+  } else if (action === 'delete') {
+    if (confirm('Excluir esta aposta?')) {
+      state.apostas = state.apostas.filter(a => a.id !== id);
+      saveState();
+      render();
+      showToast('Aposta excluída.');
+    }
+  } else if (action === 'resolve-green') {
+    ap.resultado = 'green';
+    saveState();
+    render();
+    showToast('Marcada como Green!');
+  } else if (action === 'resolve-red') {
+    ap.resultado = 'red';
+    saveState();
+    render();
+    showToast('Marcada como Red.');
+  }
+});
+
+document.getElementById('filterRow').addEventListener('click', (e) => {
+  const btn = e.target.closest('button');
+  if (!btn) return;
+  document.querySelectorAll('#filterRow button').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  currentFilter = btn.dataset.f;
+  renderList();
+});
+
+document.getElementById('bancaInicial').addEventListener('change', async (e) => {
+  state.bancaInicial = parseFloat(e.target.value) || 0;
+  saveState();
+  render();
+});
+
+document.getElementById('btnAdicionarAporte').addEventListener('click', () => {
+  const input = document.getElementById('novoAporte');
+  const valor = parseFloat(input.value);
+  if (!valor || valor <= 0) {
+    showToast('Digite um valor válido de aporte.');
+    return;
+  }
+  state.bancaInicial = (parseFloat(state.bancaInicial) || 0) + valor;
+  document.getElementById('bancaInicial').value = state.bancaInicial;
+  input.value = '';
+  saveState();
+  render();
+  showToast(`Aporte de ${fmtMoney(valor)} adicionado!`);
+});
+document.getElementById('stakePadrao').addEventListener('change', async (e) => {
+  state.stakePadrao = parseFloat(e.target.value) || 0;
+  saveState();
+  updateSugestao();
+});
+
+document.getElementById('btnExportar').addEventListener('click', exportarBackup);
+document.getElementById('btnImportar').addEventListener('click', () => {
+  document.getElementById('fileImportar').click();
+});
+document.getElementById('fileImportar').addEventListener('change', (e) => {
+  const file = e.target.files[0];
+  if (file) importarBackup(file);
+  e.target.value = '';
+});
+
+if ('serviceWorker' in navigator && (location.protocol === 'https:' || location.hostname === 'localhost')) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('sw.js').catch(() => {});
+  });
+}
+
+loadState();
+</script>
+
+</body>
+</html>
